@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced BMI Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #3498db;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --background: #f8f9fa;
+      --border: #dfe6e9;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: var(--background);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 25px;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      padding: 30px;
+      border-radius: 20px;
+    }
+    
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+    
+    .calculator-card, .info-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+      padding: 30px;
+      transition: transform 0.3s ease;
+    }
+    
+    .calculator-card:hover, .info-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    h1 {
+      text-align: center;
+      color: var(--dark);
+      margin-bottom: 20px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    h2 {
+      color: var(--dark);
+      margin: 20px 0 15px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .unit-toggle {
+      display: flex;
+      background: var(--light);
+      border-radius: 10px;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .unit-toggle label {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .unit-toggle input[type="radio"] {
+      display: none;
+    }
+    
+    .unit-toggle input[type="radio"]:checked + label {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .input-field {
+      margin-bottom: 20px;
+    }
+    
+    .input-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .input-field input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .input-field input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+    }
+    
+    .btn-secondary:hover {
+      background: #d5dbdb;
+      transform: translateY(-2px);
+    }
+    
+    #result {
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 18px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .bmi-value {
+      font-size: 42px;
+      font-weight: 700;
+      margin: 10px 0;
+    }
+    
+    .bmi-category {
+      font-size: 22px;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 50px;
+    }
+    
+    .bmi-message {
+      font-size: 16px;
+      font-weight: 400;
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+    
+    .bmi-scale {
+      display: flex;
+      height: 25px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 30px 0 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .scale-segment {
+      flex: 1;
+      position: relative;
+    }
+    
+    .scale-label {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 5px;
+      color: var(--dark);
+      font-weight: 500;
+    }
+    
+    .bmi-marker {
+      position: absolute;
+      top: -25px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 15px solid var(--dark);
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    
+    .health-tips {
+      background: var(--light);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .health-tips h2 {
+      margin-top: 0;
+    }
+    
+    .tips-list {
+      list-style-type: none;
+    }
+    
+    .tips-list li {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .tips-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .tips-list i {
+      color: var(--success);
+      min-width: 20px;
+      margin-top: 3px;
+    }
+    
+    .note {
+      background: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    
+    .bmi-categories {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .category-card {
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .category-card h3 {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 20px;
+        flex-wrap: wrap;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        padding: 15px;
+      }
+      
+      .bmi-value {
+        font-size: 36px;
+      }
+      
+      .bmi-category {
+        font-size: 18px;
+      }
+      
+      .calculator-card,
+      .info-card {
+        padding: 20px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+    
+    .input-hint {
+      font-size: 13px;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="calculator-card">
+      <h1><i class="fas fa-weight-scale"></i> Advanced BMI Calculator</h1>
+      
+      <div class="input-group">
+        <h2><i class="fas fa-weight-hanging"></i> Weight</h2>
+        <div class="unit-toggle">
+          <input type="radio" name="weightUnit" value="kg" id="kg" checked onchange="toggleWeight()">
+          <label for="kg">Kilograms (kg)</label>
+          <input type="radio" name="weightUnit" value="lbs" id="lbs" onchange="toggleWeight()">
+          <label for="lbs">Pounds (lbs)</label>
+        </div>
+        
+        <div id="weight-kg-div">
+          <div class="input-field">
+            <label for="weight-kg">Weight in kilograms</label>
+            <input type="number" id="weight-kg" placeholder="e.g., 70.5" min="1" step="0.1">
+            <div class="input-hint">Enter kilograms (e.g., 65.3 for 65kg and 300g)</div>
+          </div>
+        </div>
+        
+        <div id="weight-lbs-div" style="display:none;">
+          <div class="input-field">
+            <label for="weight-lbs">Weight in pounds</label>
+            <input type="number" id="weight-lbs" placeholder="e.g., 154.7" min="1" step="0.1">
+            <div class="input-hint">Enter pounds (e.g., 154.7 for 154 lbs and 11.2 oz)</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <h2><i class="fas fa-ruler-vertical"></i> Height</h2>
+        <div class="unit-toggle">
+          <input type="radio" name="heightUnit" value="cm" id="cm" checked onchange="toggleHeight()">
+          <label for="cm">Centimeters (cm)</label>
+          <input type="radio" name="heightUnit" value="ft" id="ft" onchange="toggleHeight()">
+          <label for="ft">Feet (ft)</label>
+        </div>
+        
+        <div id="height-cm-div">
+          <div class="input-field">
+            <label for="height-cm">Height in centimeters</label>
+            <input type="number" id="height-cm" placeholder="e.g., 175.2" min="50" step="0.1">
+            <div class="input-hint">Enter centimeters (e.g., 175.2 for 175 cm and 2 mm)</div>
+          </div>
+        </div>
+        
+        <div id="height-ft-div" style="display:none;">
+          <div class="input-field">
+            <label for="height-ft">Height in feet</label>
+            <input type="number" id="height-ft" placeholder="e.g., 5.75" min="1" step="0.01">
+            <div class="input-hint">Enter feet (e.g., 5.75 for 5 feet 9 inches)</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <button class="btn btn-primary" onclick="calculateBMI()">
+          <i class="fas fa-calculator"></i> Calculate BMI
+        </button>
+        <button class="btn btn-secondary" onclick="clearForm()">
+          <i class="fas fa-eraser"></i> Clear
+        </button>
+      </div>
+      
+      <div id="result">
+        <div class="bmi-value" id="bmi-value">--</div>
+        <div class="bmi-category" id="bmi-category">--</div>
+        <div class="bmi-message" id="bmi-message">--</div>
+        
+        <div class="bmi-scale" id="bmi-scale">
+          <div class="scale-segment" style="background: #d1ecf1;"></div>
+          <div class="scale-segment" style="background: #d4edda;"></div>
+          <div class="scale-segment" style="background: #fff3cd;"></div>
+          <div class="scale-segment" style="background: #ffeeba;"></div>
+          <div class="scale-segment" style="background: #f8d7da;"></div>
+          <div class="bmi-marker" id="bmi-marker"></div>
+        </div>
+        
+        <div class="scale-labels" style="display: flex; justify-content: space-between;">
+          <span class="scale-label">Underweight</span>
+          <span class="scale-label">Healthy</span>
+          <span class="scale-label">Overweight</span>
+          <span class="scale-label">Obese</span>
+          <span class="scale-label">Extreme</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-heartbeat"></i> Health Tips</h2>
+      <div class="health-tips">
+        <h2><i class="fas fa-lightbulb"></i> General Health Tips</h2>
+        <ul class="tips-list">
+          <li><i class="fas fa-apple-alt"></i> Eat a balanced diet with plenty of fruits and vegetables</li>
+          <li><i class="fas fa-running"></i> Aim for at least 150 minutes of exercise weekly</li>
+          <li><i class="fas fa-glass-whiskey"></i> Stay hydrated - drink 8 glasses of water daily</li>
+          <li><i class="fas fa-moon"></i> Get 7-9 hours of quality sleep each night</li>
+          <li><i class="fas fa-stress-ball"></i> Manage stress through meditation or hobbies</li>
+        </ul>
+      </div>
+      
+      <div class="health-tips">
+        <h2><i class="fas fa-clipboard-list"></i> BMI Category Tips</h2>
+        <div id="category-tips">
+          <p>Select a BMI category to see specific health tips:</p>
+          <div class="bmi-categories">
+            <div class="category-card" style="background: #d1ecf1;" onclick="showTips('underweight')">
+              <h3>Underweight</h3>
+              <p>BMI &lt; 18.5 🍂</p>
+            </div>
+            <div class="category-card" style="background: #d4edda;" onclick="showTips('healthy')">
+              <h3>Healthy Weight</h3>
+              <p>18.5 - 24.9 🌟</p>
+            </div>
+            <div class="category-card" style="background: #fff3cd;" onclick="showTips('overweight')">
+              <h3>Overweight</h3>
+              <p>25 - 29.9 ⚠️</p>
+            </div>
+            <div class="category-card" style="background: #f8d7da;" onclick="showTips('obese')">
+              <h3>Obese</h3>
+              <p>30+ 🔥</p>
+            </div>
+          </div>
+        </div>
+        <div id="specific-tips" style="display: none; margin-top: 20px;">
+          <ul class="tips-list" id="tips-content"></ul>
+          <button class="btn btn-secondary" onclick="hideTips()" style="margin-top: 15px;">
+            <i class="fas fa-arrow-left"></i> Back to Categories
+          </button>
+        </div>
+      </div>
+      
+      <div class="note">
+        <strong><i class="fas fa-info-circle"></i> Note:</strong> BMI is a screening tool and may not reflect body fatness or health of an individual. Factors like muscle mass, bone density, and distribution of fat can affect BMI accuracy.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load saved preferences on page load
+    window.onload = function() {
+      const savedWeightUnit = localStorage.getItem('weightUnitPref');
+      const savedHeightUnit = localStorage.getItem('heightUnitPref');
+      
+      if (savedWeightUnit) {
+        document.querySelector(`input[name="weightUnit"][value="${savedWeightUnit}"]`).checked = true;
+        toggleWeight();
+      }
+      
+      if (savedHeightUnit) {
+        document.querySelector(`input[name="heightUnit"][value="${savedHeightUnit}"]`).checked = true;
+        toggleHeight();
+      }
+    };
+    
+    function toggleWeight() {
+      const unit = document.querySelector('input[name="weightUnit"]:checked').value;
+      document.getElementById('weight-kg-div').style.display = (unit === 'kg') ? 'block' : 'none';
+      document.getElementById('weight-lbs-div').style.display = (unit === 'lbs') ? 'block' : 'none';
+      
+      // Save preference
+      localStorage.setItem('weightUnitPref', unit);
+    }
+    
+    function toggleHeight() {
+      const unit = document.querySelector('input[name="heightUnit"]:checked').value;
+      document.getElementById('height-cm-div').style.display = (unit === 'cm') ? 'block' : 'none';
+      document.getElementById('height-ft-div').style.display = (unit === 'ft') ? 'block' : 'none';
+      
+      // Save preference
+      localStorage.setItem('heightUnitPref', unit);
+    }
+    
+    function calculateBMI() {
+      const weightUnit = document.querySelector('input[name="weightUnit"]:checked').value;
+      const heightUnit = document.querySelector('input[name="heightUnit"]:checked').value;
+      let weightKg, heightM;
+      
+      // Convert weight to kg
+      if (weightUnit === 'kg') {
+        weightKg = parseFloat(document.getElementById('weight-kg').value);
+      } else {
+        const lbs = parseFloat(document.getElementById('weight-lbs').value) || 0;
+        weightKg = lbs * 0.453592;
+      }
+      
+      // Convert height to meters
+      if (heightUnit === 'cm') {
+        heightM = parseFloat(document.getElementById('height-cm').value) / 100;
+      } else {
+        const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+        heightM = ft * 0.3048;
+      }
+      
+      const resultDiv = document.getElementById('result');
+      
+      if (!weightKg || !heightM || weightKg <= 0 || heightM <= 0) {
+        resultDiv.style.display = 'block';
+        resultDiv.style.background = '#f8d7da';
+        document.getElementById('bmi-value').textContent = "Invalid";
+        document.getElementById('bmi-category').textContent = "Error";
+        document.getElementById('bmi-message').textContent = "Please enter valid weight and height values.";
+        document.getElementById('bmi-marker').style.display = 'none';
+        return;
+      }
+      
+      const bmi = weightKg / (heightM * heightM);
+      let status = "", bg = "", color = "", emoji = "", message = "";
+      
+      if (bmi < 18.5) {
+        status = "Underweight"; bg = "#d1ecf1"; color = "#0c5460"; emoji = "🍂";
+        message = "Consider consulting a nutritionist to develop a healthy weight gain plan.";
+      } else if (bmi < 25) {
+        status = "Healthy Weight"; bg = "#d4edda"; color = "#155724"; emoji = "🌟";
+        message = "Great job! Maintain your healthy habits with balanced nutrition and regular exercise.";
+      } else if (bmi < 30) {
+        status = "Overweight"; bg = "#fff3cd"; color = "#856404"; emoji = "⚠️";
+        message = "Focus on a balanced diet and regular physical activity to improve your health.";
+      } else if (bmi < 35) {
+        status = "Obese"; bg = "#ffeeba"; color = "#8a6d3b"; emoji = "🔥";
+        message = "Consider consulting a healthcare provider for a personalized weight management plan.";
+      } else {
+        status = "Extremely Obese"; bg = "#f8d7da"; color = "#721c24"; emoji = "❗";
+        message = "Please consult a healthcare professional for guidance on improving your health.";
+      }
+      
+      // Position marker on BMI scale
+      let markerPosition = 0;
+      if (bmi < 15) markerPosition = 0;
+      else if (bmi > 40) markerPosition = 100;
+      else markerPosition = (bmi - 15) / (40 - 15) * 100;
+      
+      resultDiv.style.display = 'block';
+      resultDiv.style.background = bg;
+      document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+      document.getElementById('bmi-category').textContent = status + " " + emoji;
+      document.getElementById('bmi-category').style.background = bg;
+      document.getElementById('bmi-category').style.color = color;
+      document.getElementById('bmi-message').textContent = message;
+      document.getElementById('bmi-marker').style.display = 'block';
+      document.getElementById('bmi-marker').style.left = `${markerPosition}%`;
+    }
+    
+    function clearForm() {
+      document.getElementById('weight-kg').value = '';
+      document.getElementById('weight-lbs').value = '';
+      document.getElementById('height-cm').value = '';
+      document.getElementById('height-ft').value = '';
+      document.getElementById('result').style.display = 'none';
+    }
+    
+    function showTips(category) {
+      document.getElementById('category-tips').style.display = 'none';
+      document.getElementById('specific-tips').style.display = 'block';
+      
+      const tipsList = document.getElementById('tips-content');
+      tipsList.innerHTML = '';
+      
+      let tips = [];
+      
+      switch(category) {
+        case 'underweight':
+          tips = [
+            "Increase calorie intake with nutrient-dense foods like nuts, avocados, and whole grains",
+            "Include protein-rich foods in every meal (eggs, lean meats, legumes)",
+            "Strength training can help build muscle mass",
+            "Eat smaller, more frequent meals throughout the day",
+            "Consult with a nutritionist for personalized advice"
+          ];
+          break;
+        case 'healthy':
+          tips = [
+            "Maintain your current healthy eating habits",
+            "Continue regular physical activity (150 minutes/week)",
+            "Monitor your weight monthly to maintain your healthy range",
+            "Include both cardio and strength training in your routine",
+            "Stay hydrated and get adequate sleep"
+          ];
+          break;
+        case 'overweight':
+          tips = [
+            "Reduce portion sizes and limit high-calorie foods",
+            "Increase daily physical activity (aim for 30 minutes/day)",
+            "Focus on whole foods like fruits, vegetables, and lean proteins",
+            "Limit sugary drinks and snacks",
+            "Set realistic weight loss goals (1-2 lbs per week)"
+          ];
+          break;
+        case 'obese':
+          tips = [
+            "Consult a healthcare provider before starting any weight loss program",
+            "Consider working with a dietitian for personalized meal planning",
+            "Start with low-impact exercises like walking or swimming",
+            "Keep a food diary to track eating habits",
+            "Set achievable short-term goals to build momentum"
+          ];
+          break;
+      }
+      
+      tips.forEach(tip => {
+        const li = document.createElement('li');
+        li.innerHTML = `<i class="fas fa-check-circle"></i> ${tip}`;
+        tipsList.appendChild(li);
+      });
+    }
+    
+    function hideTips() {
+      document.getElementById('category-tips').style.display = 'block';
+      document.getElementById('specific-tips').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
