@@ -18,6 +18,7 @@ from app.models import (
 )
 
 from .factory import generate_router
+from .auth import router as auth_router
 
 MODELS = [
     User,
@@ -33,6 +34,9 @@ MODELS = [
 ]
 
 api_router = APIRouter()
+
+# authentication routes
+api_router.include_router(auth_router)
 
 for m in MODELS:
     crud = get_crud(m)

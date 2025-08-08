@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.database import get_db
+from .auth import get_current_user
 
 
 def generate_router(
@@ -18,7 +19,11 @@ def generate_router(
 ) -> APIRouter:
     """Create an APIRouter with standard CRUD endpoints for a model."""
 
-    router = APIRouter(prefix=f"/{model_name.lower()}", tags=[model_name])
+    router = APIRouter(
+        prefix=f"/{model_name.lower()}",
+        tags=[model_name],
+        dependencies=[Depends(get_current_user)],
+    )
 
     @router.get("/", response_model=list[schema_read])
     def read_items(db: Session = Depends(get_db)):

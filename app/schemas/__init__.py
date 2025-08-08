@@ -39,3 +39,8 @@ for m in MODELS:
     __all__.extend(
         [f"{m.__name__}Create", f"{m.__name__}Read", f"{m.__name__}Update"]
     )
+
+# authentication schemas
+from .auth import Token
+
+__all__.append("Token")
