@@ -19,7 +19,14 @@ def create_schemas(
         for column in model.__table__.columns:
             if exclude_pk and column.primary_key:
                 continue
-            python_type = getattr(column.type, "python_type", Any)
+            try:
+                python_type = column.type.python_type
+            except (NotImplementedError, AttributeError):
+                python_type = Any
+            except Exception as exc:  # pragma: no cover - defensive
+                raise TypeError(
+                    f"Unable to determine python type for column '{column.name}' on model '{model.__name__}'"
+                ) from exc
             default = None
             if column.default is not None and column.default.is_scalar:
                 default = column.default.arg
