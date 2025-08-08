@@ -16,13 +16,14 @@ def generate_router(
     schema_read: Type,
     schema_create: Type,
     schema_update: Type,
+    use_auth: bool = True,
 ) -> APIRouter:
     """Create an APIRouter with standard CRUD endpoints for a model."""
 
     router = APIRouter(
         prefix=f"/{model_name.lower()}",
         tags=[model_name],
-        dependencies=[Depends(get_current_user)],
+        dependencies=[Depends(get_current_user)] if use_auth else [],
     )
 
     @router.get("/", response_model=list[schema_read])
